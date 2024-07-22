@@ -59,7 +59,7 @@ function martingale(){
         echo -e "${yellowColour}[+]${endColour} ${grayColour}Number${endColour} ${turquoiseColour}$random_number ${endColour}"
 
         #Logical checker that verifies the value of the random number and compares it to the selected category.
-        if [ ! "$money" -le 0 ]; then
+        if [ ! "$money" -lt 0 ]; then
             if [ $(($random_number % 2)) -eq 0 ]; then
                 if [ "$random_number" -eq 0 ]; then
                     #echo -e "${yellowColour}[!]${endColour}${redColour} You lost${endColour}"
@@ -82,6 +82,8 @@ function martingale(){
                     badPlayCounter=""
 
                     echo -e "\n${yellowColour}[+]${endColour} ${grayColour}You currently have${endColour} ${orangeColour}$ $money${endColour}"
+
+                    initialBet=$backupBet
                     
                 elif [ "$random_number" -ne 0 ]; then
                     #echo -e "${yellowColour}[!]${endColour}${redColour} You lost${endColour}"
@@ -103,6 +105,8 @@ function martingale(){
                     badPlayCounter=""
 
                     echo -e "\n${yellowColour}[+]${endColour} ${grayColour}You currently have${endColour} ${orangeColour}$ $money${endColour}"
+
+                    initialBet=$backupBet
                 else
                     #echo -e "${yellowColour}[!]${endColour}${redColour} You lost${endColour}"
 
@@ -116,8 +120,8 @@ function martingale(){
             
         else
             echo -e "\n${yellowColour}[!]${endColour} ${maroonColour}You're broke!!${endColour}"
-            echo -e "There have been a total of $playCounter plays."
-            echo -e "Consecutive bad plays causing a loss: $badPlayCounter"
+            echo -e "There have been a total of $(($playCounter-1)) plays."
+            echo -e "Consecutive bad plays causing a loss: [ $badPlayCounter ]"
             echo -e "Highest Win: $topWin"
             tput cnorm; exit 0
         fi
