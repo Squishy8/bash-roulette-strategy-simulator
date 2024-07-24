@@ -186,10 +186,6 @@ function inverselabrouchere(){
                         echo -e "${yellowColour}[+]${endColour} ${grayColour}Remaking sequence as${endColour}${orangeColour} [${mySequence[@]}]${endColour}"
                         
                         #break Debug
-                    elif [ $money -lt $(($betToRenew - $initialMoney)) ]; then
-                        betToRenew=$(($betToRenew-$initialMoney))
-                        echo -e "${yellowColour}[+]${endColour} ${grayColour}A critical minimum has been reached. The new goal will be readjusted to${endColour} ${orangeColour}\$$betToRenew${endColour}"
-
                     else
                         mySequence+=($bet)
                         mySequence=(${mySequence[@]})
@@ -206,6 +202,7 @@ function inverselabrouchere(){
                             echo -e "${redColour}[!] The sequence has ended...${endColour}"
                             mySequence=(1 2 3 4)
                             echo -e "${yellowColour}[+]${endColour} ${grayColour}Remaking sequence as${endColour}${orangeColour} ${mySequence[@]}${endColour}"
+                            bet=$((${mySequence[0]} + ${mySequence[-1]}))
                         fi
                     fi
                 elif [ $(("$random_number" % 2)) -eq 1 ] || [ "$random_number" -eq 0 ]; then
@@ -213,34 +210,57 @@ function inverselabrouchere(){
                         echo -e "${yellowColour}[!]${endColour} ${grayColour}${endColour} ${redColour}¡You Lost (odd)!${endColour}"
                     else
                         echo -e "${yellowColour}[!]${endColour} ${grayColour}${endColour} ${redColour}¡You Lost (0)!${endColour}"
-
                     fi
-                    unset mySequence[0]
-                    unset mySequence[-1] 2>/dev/null
+                    if [ $money -lt $(($betToRenew - $initialMoney)) ]; then
+                        betToRenew=$(($betToRenew-$(($initialMoney / 2))))
+                        echo -e "${yellowColour}[+]${endColour} ${grayColour}A critical minimum has been reached. The new goal will be readjusted to${endColour} ${orangeColour}\$$betToRenew${endColour}"
 
-                    mySequence=(${mySequence[@]})
+                        unset mySequence[0]
+                        unset mySequence[-1] 2>/dev/null
 
-                    echo -e "${yellowColour}[+]${endColour} ${grayColour}The new sequence is${endColour} ${orangeColour}[${mySequence[@]}]${endCollour}"
+                        mySequence=(${mySequence[@]})
 
-                    if [ "${#mySequence[@]}" -ne 1 ] && [ "${#mySequence[@]}" -ne 0 ]; then
+                        echo -e "${yellowColour}[+]${endColour} ${grayColour}New sequence:${endColour} ${orangeColour}[${mySequence[@]}]${endColour}"
+                        
+                        if [ "${#mySequence[@]}" -ne 1 ] && [ "${#mySequence[@]}" -ne 0 ]; then
 
-                        #We update the value of our bet
-                        bet=$((${mySequence[0]} + ${mySequence[-1]}))
-                    elif [ "${#mySequence[@]}" -eq 1 ]; then
-                        bet=${mySequence[0]}
+                            #We update the value of our bet
+                            bet=$((${mySequence[0]} + ${mySequence[-1]}))
+                        elif [ "${#mySequence[@]}" -eq 1 ]; then
+                            bet=${mySequence[0]}
+                        else
+                            echo -e "${redColour}[!] The sequence has ended...${endColour}"
+                            mySequence=(1 2 3 4)
+                            echo -e "${yellowColour}[+]${endColour} ${grayColour}Remaking sequence as${endColour}${orangeColour} ${mySequence[@]}${endColour}"
+                            bet=$((${mySequence[0]} + ${mySequence[-1]}))
+                        fi
+                    else                    
+                        unset mySequence[0]
+                        unset mySequence[-1] 2>/dev/null
 
-                    else
+                        mySequence=(${mySequence[@]})
 
-                        echo -e "${redColour}[!] The sequence has ended...${endColour}"
+                        echo -e "${yellowColour}[+]${endColour} ${grayColour}The new sequence is${endColour} ${orangeColour}[${mySequence[@]}]${endCollour}"
 
-                        mySequence=(1 2 3 4)
+                        if [ "${#mySequence[@]}" -ne 1 ] && [ "${#mySequence[@]}" -ne 0 ]; then
 
-                        echo -e "${yellowColour}[+]${endColour} ${grayColour}Remaking sequence as${endColour}${orangeColour} [${mySequence[@]}]${endColour}"
+                            #We update the value of our bet
+                            bet=$((${mySequence[0]} + ${mySequence[-1]}))
+                        elif [ "${#mySequence[@]}" -eq 1 ]; then
+                            bet=${mySequence[0]}
 
-                        bet=$((${mySequence[0]}+${mySequence[-1]}))
+                        else
 
+                            echo -e "${redColour}[!] The sequence has ended...${endColour}"
+
+                            mySequence=(1 2 3 4)
+
+                            echo -e "${yellowColour}[+]${endColour} ${grayColour}Remaking sequence as${endColour}${orangeColour} [${mySequence[@]}]${endColour}"
+
+                            bet=$((${mySequence[0]}+${mySequence[-1]}))
+
+                        fi
                     fi
-
                 fi
 
             fi
@@ -278,3 +298,5 @@ else
 fi
 
 #Implement checkers that verify that the technique selection, odd/even selection and money amount are actually correct
+#The checker for the betToRenew variable for critical values does not take place if we lose, only if we win. Implement functionality in loss as well
+#Show in the Inverse Labrouchere the sequence with the most elements and the highest earnings during a play.
