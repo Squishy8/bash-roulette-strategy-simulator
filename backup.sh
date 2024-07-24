@@ -146,16 +146,10 @@ function inverselabrouchere(){
 
     playCounter=0
 
-    betToRenew=$(($money+$(($money / 2)))) #Stores the amount of money that will be our goal to reach. When this amount is achieved, we will renew the sequence
-
-    initialMoney=$money #Backup for initial money input
-
-    echo -e "${yellowColour}[+]${endColour} ${grayColour}The goal to reach is set to being above ${endColour} ${orangeColour}\$$betToRenew${endColour}"
-
     tput civis
     while true; do
         let playCounter+=1
-        sleep 0.01
+        sleep 0.02
         random_number=$(($RANDOM % 37))
         let money-=$bet #We subtract the amount of money we bet to our total amount of money
         if [ ! "$money" -lt 0 ]; then
@@ -173,41 +167,25 @@ function inverselabrouchere(){
 
                     let money+=$reward
 
-                    echo -e "${yellowColour}[+] You have${endColour}${orangeColour} \$$money${endColour}"
+                    echo -e "${yellowColour}[+] You have${endColour}${orangeColour} $money${endColour}"
 
-                    if [ $money -gt $betToRenew ];then
-            
-                        echo -e "${yellowColour}[+]${endColour} ${grayColour}The goal of${endColour} ${orangeColour}\$$betToRenew ${endColour}${grayColour}has been passed. The sequence will be renewed.${endColour}"
-                        let betToRenew+=$(($initialMoney / 2))
-                        echo -e "${yellowColour}[+]${endColour} ${grayColour}The new goal to reach is set to being above ${endColour} ${orangeColour}\$$betToRenew${endColour}"
-                        echo "$betToRenew"
-                        mySequence=(1 2 3 4)
-                        bet=$((${mySequence[0]}+${mySequence[-1]}))
-                        echo -e "${yellowColour}[+]${endColour} ${grayColour}Remaking sequence as${endColour}${orangeColour} [${mySequence[@]}]${endColour}"
-                        
-                        #break Debug
-                    elif [ $money -lt $(($betToRenew - $initialMoney)) ]; then
-                        betToRenew=$(($betToRenew-$initialMoney))
-                        echo -e "${yellowColour}[+]${endColour} ${grayColour}A critical minimum has been reached. The new goal will be readjusted to${endColour} ${orangeColour}\$$betToRenew${endColour}"
+                    mySequence+=($bet)
+                    mySequence=(${mySequence[@]})
 
+                    echo -e "${yellowColour}[+]${endColour} ${grayColour}New sequence:${endColour} ${orangeColour}[${mySequence[@]}]${endColour}"
+                    
+                    if [ "${#mySequence[@]}" -ne 1 ] && [ "${#mySequence[@]}" -ne 0 ]; then
+
+                        #We update the value of our bet
+                        bet=$((${mySequence[0]} + ${mySequence[-1]}))
+                    elif [ "${#mySequence[@]}" -eq 1 ]; then
+                        bet=${mySequence[0]}
                     else
-                        mySequence+=($bet)
-                        mySequence=(${mySequence[@]})
-
-                        echo -e "${yellowColour}[+]${endColour} ${grayColour}New sequence:${endColour} ${orangeColour}[${mySequence[@]}]${endColour}"
-                        
-                        if [ "${#mySequence[@]}" -ne 1 ] && [ "${#mySequence[@]}" -ne 0 ]; then
-
-                            #We update the value of our bet
-                            bet=$((${mySequence[0]} + ${mySequence[-1]}))
-                        elif [ "${#mySequence[@]}" -eq 1 ]; then
-                            bet=${mySequence[0]}
-                        else
-                            echo -e "${redColour}[!] The sequence has ended...${endColour}"
-                            mySequence=(1 2 3 4)
-                            echo -e "${yellowColour}[+]${endColour} ${grayColour}Remaking sequence as${endColour}${orangeColour} ${mySequence[@]}${endColour}"
-                        fi
+                        echo -e "${redColour}[!] The sequence has ended...${endColour}"
+                        mySequence=(1 2 3 4)
+                        echo -e "${yellowColour}[+]${endColour} ${grayColour}Remaking sequence as${endColour}${orangeColour} ${mySequence[@]}${endColour}"
                     fi
+
                 elif [ $(("$random_number" % 2)) -eq 1 ] || [ "$random_number" -eq 0 ]; then
                     if [ $(("$random_number" % 2)) -eq 1 ]; then
                         echo -e "${yellowColour}[!]${endColour} ${grayColour}${endColour} ${redColour}¡You Lost (odd)!${endColour}"
