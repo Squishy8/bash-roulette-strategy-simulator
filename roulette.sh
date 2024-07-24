@@ -144,82 +144,88 @@ function inverselabrouchere(){
 
     bet=$((${mySequence[0]}+${mySequence[-1]}))
 
+    playCounter=0
 
     tput civis
     while true; do
-        sleep 2
+        let playCounter+=1
+        sleep 0.02
         random_number=$(($RANDOM % 37))
         let money-=$bet #We subtract the amount of money we bet to our total amount of money
-        echo -e "${yellowColour}[+]${endColour} ${grayColour}Betting${endColour} ${orangeColour}\$$bet${endColour}"
-        echo -e "${yellowColour}[+]${endColour} ${grayColour}You have${endColour} ${orangeColour}\$$money${endColour}"
+        if [ ! "$money" -lt 0 ]; then
+            echo -e "${yellowColour}[+]${endColour} ${grayColour}Betting${endColour} ${orangeColour}\$$bet${endColour}"
+            echo -e "${yellowColour}[+]${endColour} ${grayColour}You have${endColour} ${orangeColour}\$$money${endColour}"
 
-        echo -e "\n${yellowColour}[+]${endColour} ${grayColour}Number${endColour} ${turquoiseColour}$random_number ${endColour}"
+            echo -e "\n${yellowColour}[+]${endColour} ${grayColour}Number${endColour} ${turquoiseColour}$random_number ${endColour}"
 
-        if [ "$parImpar" == "even" ]; then
-            if [ "$(($random_number % 2))" -eq 0 ] && [ ! "$random_number" -eq 0 ]; then
+            if [ "$parImpar" == "even" ]; then
+                if [ "$(($random_number % 2))" -eq 0 ] && [ ! "$random_number" -eq 0 ]; then
 
-                echo -e "${yellowColour}[!]${endColour} ${grayColour}El número es par,${endColour} ${greenColour}¡ganas!${endColour}"
+                    echo -e "${yellowColour}[!]${endColour} ${grayColour}El número es par,${endColour} ${greenColour}¡ganas!${endColour}"
 
-                reward=$(($bet*2))
+                    reward=$(($bet*2))
 
-                let money+=$reward
+                    let money+=$reward
 
-                echo -e "${yellowColour}[+] You have${endColour}${orangeColour} $money${endColour}"
+                    echo -e "${yellowColour}[+] You have${endColour}${orangeColour} $money${endColour}"
 
-                mySequence+=($bet)
-                mySequence=(${mySequence[@]})
+                    mySequence+=($bet)
+                    mySequence=(${mySequence[@]})
 
-                echo -e "${yellowColour}[+]${endColour} ${grayColour}New sequence:${endColour} ${orangeColour}[${mySequence[@]}]${endColour}"
-                
-                if [ "${#mySequence[@]}" -ne 1 ] && [ "${#mySequence[@]}" -ne 0 ]; then
+                    echo -e "${yellowColour}[+]${endColour} ${grayColour}New sequence:${endColour} ${orangeColour}[${mySequence[@]}]${endColour}"
+                    
+                    if [ "${#mySequence[@]}" -ne 1 ] && [ "${#mySequence[@]}" -ne 0 ]; then
 
-                    #We update the value of our bet
-                    bet=$((${mySequence[0]} + ${mySequence[-1]}))
-                elif [ "${#mySequence[@]}" -eq 1 ]; then
-                    bet=${mySequence[0]}
-                else
+                        #We update the value of our bet
+                        bet=$((${mySequence[0]} + ${mySequence[-1]}))
+                    elif [ "${#mySequence[@]}" -eq 1 ]; then
+                        bet=${mySequence[0]}
+                    else
+                        echo -e "${redColour}[!] The sequence has ended...${endColour}"
+                        mySequence=(1 2 3 4)
+                        echo -e "${yellowColour}[+]${endColour} ${grayColour}Remaking sequence as${endColour}${orangeColour} ${mySequence[@]}${endColour}"
+                    fi
 
-                    echo -e "${redColour}[!] The sequence has ended...${endColour}"
-                    mySequence=(1 2 3 4)
-                    echo -e "${yellowColour}[+]${endColour} ${grayColour}Remaking sequence as${endColour}${orangeColour} ${mySequence[@]}${endColour}"
-                fi
+                elif [ $(("$random_number" % 2)) -eq 1 ] || [ "$random_number" -eq 0 ]; then
+                    if [ $(("$random_number" % 2)) -eq 1 ]; then
+                        echo -e "${yellowColour}[!]${endColour} ${grayColour}${endColour} ${redColour}¡You Lost (odd)!${endColour}"
+                    else
+                        echo -e "${yellowColour}[!]${endColour} ${grayColour}${endColour} ${redColour}¡You Lost (0)!${endColour}"
 
-            elif [ "$random_number" -eq 0 ]; then
+                    fi
+                    unset mySequence[0]
+                    unset mySequence[-1] 2>/dev/null
 
-                echo -e "${yellowColour}[!]${endColour} ${grayColour}${endColour} ${redColour}¡You Lost!${endColour}"
+                    mySequence=(${mySequence[@]})
 
-            else
+                    echo -e "${yellowColour}[+]${endColour} ${grayColour}The new sequence is${endColour} ${orangeColour}[${mySequence[@]}]${endCollour}"
 
-                echo -e "${yellowColour}[!]${endColour} ${grayColour}${endColour} ${redColour}¡You Lost!${endColour}"
+                    if [ "${#mySequence[@]}" -ne 1 ] && [ "${#mySequence[@]}" -ne 0 ]; then
 
-                unset mySequence[0]
-                unset mySequence[-1] 2>/dev/null
+                        #We update the value of our bet
+                        bet=$((${mySequence[0]} + ${mySequence[-1]}))
+                    elif [ "${#mySequence[@]}" -eq 1 ]; then
+                        bet=${mySequence[0]}
 
-                mySequence=(${mySequence[@]})
+                    else
 
-                echo -e "${yellowColour}[+]${endColour} ${grayColour}The new sequence is${endColour} ${orangeColour}[${mySequence[@]}]${endCollour}"
+                        echo -e "${redColour}[!] The sequence has ended...${endColour}"
 
-                if [ "${#mySequence[@]}" -ne 1 ] && [ "${#mySequence[@]}" -ne 0 ]; then
+                        mySequence=(1 2 3 4)
 
-                    #We update the value of our bet
-                    bet=$((${mySequence[0]} + ${mySequence[-1]}))
-                elif [ "${#mySequence[@]}" -eq 1 ]; then
-                    bet=${mySequence[0]}
+                        echo -e "${yellowColour}[+]${endColour} ${grayColour}Remaking sequence as${endColour}${orangeColour} [${mySequence[@]}]${endColour}"
 
-                else
+                        bet=$((${mySequence[0]}+${mySequence[-1]}))
 
-                    echo -e "${redColour}[!] The sequence has ended...${endColour}"
-
-                    mySequence=(1 2 3 4)
-
-                    echo -e "${yellowColour}[+]${endColour} ${grayColour}Remaking sequence as${endColour}${orangeColour} ${mySequence[@]}${endColour}"
-
-                    bet=$((${mySequence[0]}+${mySequence[-1]}))
+                    fi
 
                 fi
 
             fi
-
+        else
+            echo -e "\n${yellowColour}[!]${endColour} ${maroonColour}You're broke!!${endColour}"
+            echo -e "There have been a total of $playCounter plays."
+            tput cnorm; exit 1
         fi
 
     done
@@ -239,7 +245,7 @@ done
 if [ $money ] && [ $technique ]; then
     if [ "$technique" == "M" ]; then
         martingale
-    elif [ "$technique" == "I"  ]; then
+    elif [ "$technique" == "R"  ]; then
         inverselabrouchere
     else 
         echo "NONO"
